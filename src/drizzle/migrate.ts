@@ -6,8 +6,8 @@ import * as schema from './schema';
 const pool = new Pool({
   host: 'localhost',
   port: 5432,
-  user: 'myuser',
-  password: 'mypassword',
+  user: 'postgres',
+  password: 'Knab@12',
   database: 'mydb',
 });
 

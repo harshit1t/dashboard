@@ -15,6 +15,6 @@ export class UserService {
   }
 
   async createUser(name: string, email: string, role: any) {
-    return await db.insert(users).values({ name, email, role });
+    return await db.insert(users).values({ email, role });
   }
 }

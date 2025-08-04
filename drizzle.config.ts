@@ -1,16 +1,16 @@
-/* eslint-disable prettier/prettier */
 import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
-  schema: './src/drizzle/schema.ts',
+  schema: './src/db/schema.ts',
+  out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {
-    host: 'localhost',
+    host: 'ep-shy-feather-a1vxl51q-pooler.ap-southeast-1.aws.neon.tech',
     port: 5432,
-    user: 'myuser',
-    password: 'mypassword',
-    database: 'mydb',
+    user: 'neondb_owner',
+    password: 'npg_j3mkIHAVi8te',
+    database: 'neondb',
+    ssl: 'require'
   },
-  out: './src/drizzle/migrations',
   verbose: true,
 });
