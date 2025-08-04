@@ -1,11 +1,16 @@
-import { defineConfig } from "drizzle-kit";
+/* eslint-disable prettier/prettier */
+import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
-  schema: "./src/db/schema.ts",  // ✅ Update this if your schema is elsewhere
-  out: "./drizzle",
-  driver: "pg",                  // ✅ this is valid in v0.31+
-  dialect: "postgresql",         // ✅ required
+  schema: './src/drizzle/schema.ts',
+  dialect: 'postgresql',
   dbCredentials: {
-    connectionString: process.env.DATABASE_URL!,
+    host: 'localhost',
+    port: 5432,
+    user: 'myuser',
+    password: 'mypassword',
+    database: 'mydb',
   },
+  out: './src/drizzle/migrations',
+  verbose: true,
 });

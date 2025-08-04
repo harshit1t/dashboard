@@ -1,0 +1,20 @@
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
+import * as schema from './schema';
+
+const pool = new Pool({
+  host: 'localhost',
+  port: 5432,
+  user: 'myuser',
+  password: 'mypassword',
+  database: 'mydb',
+});
+
+export const db = drizzle(pool, { schema });
+
+void (async () => {
+  await migrate(db, { migrationsFolder: './src/drizzle/migrations' });
+  await pool.end();
+  console.log('Migration complete');
+})();
