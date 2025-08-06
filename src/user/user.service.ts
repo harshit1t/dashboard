@@ -57,7 +57,6 @@ export class UserService {
   async getUserByEmail(email: string): Promise<User | null> {
     try {
       const user = await db.select().from(users).where(eq(users.email, email)).limit(1);
-      console.log("user",user);
       return user.length > 0 ? (user[0] as User) : null;
     } catch (error) {
       console.error('Error fetching user by email:', error);
