@@ -34,7 +34,7 @@ export class UserService {
     }
   }
 
-  async createUser(email: string, role: number, teamId: number): Promise<User> {
+  async createUser(email: string, role: Number, teamId: Number|null): Promise<User> {
     try {
       const [user] = await db.insert(users).values({ email, role, teamId }).returning();
       return user;

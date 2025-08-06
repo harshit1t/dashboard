@@ -7,7 +7,7 @@ import { z } from 'zod';
 export interface CreateUserDto {
   email: string;
   role: number;
-  teamId: number;
+  teamId: number; // teamId can be nullable
 }
 
 export interface CreateTeamDto {
@@ -21,7 +21,7 @@ export interface AddTeamMemberDto {
 
 // Zod schemas for validation
 export const CreateUserSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   role: z.number().int().min(1),
   teamId: z.number().int().min(1),
 });
