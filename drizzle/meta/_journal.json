@@ -15,6 +15,13 @@
       "when": 1754310796226,
       "tag": "0001_lying_namorita",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1754391255480,
+      "tag": "0002_fast_firestar",
+      "breakpoints": true
     }
   ]
 }
