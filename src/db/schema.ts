@@ -1,3 +1,4 @@
+import { varchar } from 'drizzle-orm/mysql-core';
 import { pgTable, serial, text, integer } from 'drizzle-orm/pg-core';
 
 // USERS
@@ -6,7 +7,7 @@ export const users = pgTable('users', {
   email: text('email').unique().notNull(),
   teamId: integer('team_id') // Nullable to avoid circular FK issues
     .references(() => teams.id),
-  role: text('role').notNull(), // e.g. 'admin', 'ops1', owner
+  role: integer('role').references(()=>roles.id).notNull(),
 });
 
 // TEAMS
@@ -49,3 +50,9 @@ export const dashboardUserAccess = pgTable('dashboard_user_access', {
   role: text('role').notNull(), // e.g. M, D, S
   tech: text('tech').notNull(), // e.g. tech1, tech2
 });
+
+
+export const roles = pgTable('roles',{
+  id : serial("id").primaryKey(),
+  name: text("name").notNull(), // e.g. admin, ops1, owner
+})
