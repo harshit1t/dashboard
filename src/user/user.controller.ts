@@ -51,23 +51,34 @@ export class UserController {
     }
   }
 
-  // endpoint to create a new user
+  // endpoint to create a new user in both db and clerk if not exists
   @Post()
-  async create(@Body() body: CreateUserDto) {
-    try {
-      // Validate input using Zod
-      CreateUserSchema.parse(body);
+async create(@Body() body: CreateUserDto) {
+  try {
+    CreateUserSchema.parse(body);
 
-      //create a new user
-      const user = await this.userService.createUser(body.email, body.role, body.teamId);
-      return { success: true, message: 'User created successfully', response: user };
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        throw new HttpException({ success: false, message: 'Validation error', response: error.issues }, HttpStatus.BAD_REQUEST);
-      }
-      throw new HttpException({ success: false, message: 'Failed to create user', response: null }, HttpStatus.INTERNAL_SERVER_ERROR);
+    const existingUser = await this.userService.getUserByEmail(body.email);
+    if (existingUser) {
+      return { success: true, message: 'User already exists in database', response: existingUser };
     }
+
+    // Add to Clerk via API
+    const clerkUser = await this.userService.addUserToClerk(body.email);
+
+    const user = await this.userService.createUser(body.email, body.role, body.teamId);
+    return {
+      success: true,
+      message: 'User created and added to Clerk dashboard',
+      response: user,
+    };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      throw new HttpException({ success: false, message: 'Validation error', response: error.issues }, HttpStatus.BAD_REQUEST);
+    }
+    throw new HttpException({ success: false, message: 'Failed to create user', response: null }, HttpStatus.INTERNAL_SERVER_ERROR);
   }
+}
+
  
   // endpoint to create a new team
   @Post('team')
@@ -131,6 +142,40 @@ export class UserController {
         throw error;
       }
       throw new HttpException({ success: false, message: 'Failed to add team member', response: null }, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // 
+  @Get("me")
+  async getMe(@Req() req: Request): Promise<{ success: boolean; message: string; response: any }> {
+    try {
+      const email = (req as any).clerkUser?.email;
+      if (!email) {
+        throw new HttpException({ success: false, message: 'Unauthorized: User not found in request', response: null }, HttpStatus.UNAUTHORIZED);
+      }
+
+      // Fetch user from DB
+      const user = await this.userService.getUserByEmail(email);
+      if (!user) {
+        throw new HttpException({ success: false, message: 'User not found in database', response: null }, HttpStatus.NOT_FOUND);
+      }
+
+      // Use the new service to get teams and dashboards based on role
+      const result = await this.userService.getUserAccessByRole(user.id, user.role);
+      const { teams } = result;
+      // Extract dashboards from the first team, or set to [] if no teams
+      const dashboards = teams && teams.length > 0 ? teams[0].dashboards : [];
+      return {
+        success: true,
+        message: 'User, teams, and dashboards fetched successfully',
+        response: {
+          user,
+          teams,
+          dashboards
+        }
+      };
+    } catch (error) {
+      throw new HttpException({ success: false, message: 'Failed to fetch user/teams/dashboards', response: null }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
