@@ -145,7 +145,7 @@ async create(@Body() body: CreateUserDto) {
     }
   }
 
-  // 
+  // endpoint to get the data of the currently logged-in user
   @Get("me")
   async getMe(@Req() req: Request): Promise<{ success: boolean; message: string; response: any }> {
     try {

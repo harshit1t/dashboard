@@ -246,8 +246,18 @@ export class UserService {
           });
         }
       } else if (role === 3) {
-        // Role 3 → Only dashboards of user’s team (no team metadata required)
+        // Role 3 → Only dashboards of user's team (with team metadata)
         if (!user.teamId) return response;
+
+        // Get team information
+        const [team] = await db
+          .select({
+            id: teams.id,
+            name: teams.name,
+            ownerId: teams.ownerId,
+          })
+          .from(teams)
+          .where(eq(teams.id, user.teamId));
 
         const dashboardsForTeam = await db
           .select({
@@ -264,8 +274,8 @@ export class UserService {
 
         response.teams.push({
           id: user.teamId,
-          name: '',
-          ownerId: 0,
+          name: team?.name || "",
+          ownerId: team?.ownerId || 0,
           dashboards: dashboardsForTeam,
         });
       } else {
